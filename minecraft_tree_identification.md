@@ -1,0 +1,7 @@
+# Minecraft Tree Identification
+
+Repo: https://github.com/AghastComet/Minecraft-Tree-Finder
+
+This is a neural network using mobilenet and faster rcnn to try to identify trees in Minecraft. This was mainly an attemt to get more experiance working with images in pytorch and using screenshots from Minecraft makes it easy to get data. Unfortunately, the resulting network doesn't actually work. I want to work more with this before I declare it a total failure. My current ideas are to add more data or to try different data. I think there might be a deeper issue than just not enough data, so testing with a different dataset, maybe something closer to what mobilenet was trained with, might increase the perforance and if it doesn't then I want to try with more data.
+
+If I can get performance to improve, then I want to create a seperate dedicated testing dataset, add in images with more than one tree, terrain, animals, ui, and different graphics settings. At that point, I want to expand to more than just trees, most likely animals or ores.
