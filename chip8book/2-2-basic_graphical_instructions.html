@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Graphical Instructions for the First Test - Writing a Chip-8 Emulator in Rust</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="0-initial_framework.html"><strong aria-hidden="true">1.</strong> Initial Framework</a></li><li class="chapter-item expanded "><a href="1-first_test.html"><strong aria-hidden="true">2.</strong> First Test</a></li><li class="chapter-item expanded "><a href="2-passing_first_test.html"><strong aria-hidden="true">3.</strong> Passing the First Test</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="2-1-basic_instructions.html"><strong aria-hidden="true">3.1.</strong> Basic Instructions for the First Test</a></li><li class="chapter-item expanded "><a href="2-2-basic_graphical_instructions.html" class="active"><strong aria-hidden="true">3.2.</strong> Graphical Instructions for the First Test</a></li></ol></li><li class="chapter-item expanded "><a href="checkpoint_1.html"><strong aria-hidden="true">4.</strong> Checkpoint 1</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">5.</strong> Todo</a></li><li class="chapter-item expanded "><a href="refernces.html"><strong aria-hidden="true">6.</strong> References</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Writing a Chip-8 Emulator in Rust</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="graphical-instructions-for-the-first-test"><a class="header" href="#graphical-instructions-for-the-first-test">Graphical Instructions for the First Test</a></h1>
+<p>We only have two instructions to implement, 0x00E0 and the 0xD--- range, but before we do that we need to add a display. We can simply use a 2d array of booleans to represent the screen. The screen is 64x32 and starts with all pixels off.</p>
+<pre><code class="language-rust">pub struct Chip8{
+    ...
+    screen: [[bool; 32]; 64],
+}
+
+impl Chip8{
+    pub fn new(program: &amp;[u8])-&gt;Self{
+        Self{
+            ...
+            screen: [[false; 32]; 64],
+        }
+    }
+}</code></pre>
+<p>Now we can implement the 0x00E0 instruction really easily by just reseting the screen variable.</p>
+<pre><code class="language-rust">impl Chip8{
+    ...
+    pub fn step(&amp;mut self){
+        let opcode = self.fetch();
+        match opcode{
+            0x00E0 =&gt; self.screen = [[false; 32]; 64],
+            ...
+        }
+    }
+}</code></pre>
+<p>Next we want to implement the 0xD--- block. For this we need two more helper functions: get_y and get_n.</p>
+<pre><code class="language-rust">impl Chip8{
+    ...
+    fn get_y(opcode: u16)-&gt;usize{
+        ((opcode &amp; 0x00F0) &gt;&gt; 4) as usize
+    }
+    fn get_n(opcode: u16)-&gt;u8{
+        (opcode &amp; 0x000F) as u8
+    }
+}</code></pre>
+<p>Then we want to create and call a function to handle drawing that we pass x, y, and n.</p>
+<pre><code class="language-rust">impl Chip8{
+    pub fn step(&amp;mut self){
+        let opcode = self.fetch();
+        match opcode{
+            0xD000..=0xDFFF =&gt; self.draw(Self::get_x(opcode), Self::get_y(opcode), Self::get_n(opcode)),
+            ...
+        }
+    }
+    fn draw(&amp;mut self, rx: usize, ry: usize, n: u8){
+        
+    }
+}</code></pre>
+<p>As for the actual drawing, it works like this: the index register points to a sprite. The spite is 8 pixels wide and n pixels tall and we need to draw it starting with the top left at (x,y) where x is the value in the rx register and y is the value in the ry register. Each pixel is represented by one bit in the spite and each row is one byte. If the bit is on, we toggle that pixel, otherwise we don't do anything. If a pixel turns off, we need to set the last 8 bit register to 1, otherwise we set it to 0. We also need to keep in mind that if x is bigger than the width or y is bigger than the height we wrap around, but only for the start posision. If the sprite starts drawing and doesn't fit on the screen where it's at it will just stop. To acheve this last point, we just need to do <code>let x = self.registers[rx]%64;</code> and <code>let y = self.registers[ry]%32;</code> and only at the very begining. All together the drawing function can look something like this.</p>
+<pre><code class="language-rust">impl Chip8{
+    fn draw(&amp;mut self, rx: usize, ry: usize, n: u8){
+        // Set to false to start with, set to true if any pixels are toggled to off
+        self.registers[15] = 0;
+
+        // Get inital location on the screen
+        let x = self.registers[rx]%64;
+        let y = self.registers[ry]%32;
+
+        // for each row in the sprite
+        for dy in 0..n{
+
+            // get y coordinate for that row
+            let py = (y + dy) as usize;
+
+            // Stop drawing if its off the screen
+            if py &gt;= 32{
+                return;
+            }
+
+            // Get the byte for that row
+            let byte = self.ram[self.index as usize + dy as usize];
+
+            // For each column in the sprite
+            for dx in 0..8{
+
+                // get x coordinate for that column
+                let px = (x + dx) as usize;
+
+                // stop drawing row if its off the screen
+                if px &gt;= 64{
+                    break;
+                }
+
+                // get bit for the row/column in the sprite
+                let bit = byte &amp; (0x80 &gt;&gt; dx) != 0;
+
+                // If it should toggle the pixel on the screen
+                if bit{
+
+                    // If the pixel is alread on, toggle it to off and set the last register to 1
+                    // Otherwise just turn the pixel on on the screen
+                    if self.screen[px][py]{
+                        self.screen[px][py] = false;
+                        self.registers[15] = 1;
+                    } else {
+                        self.screen[px][py] = true;
+                    }
+                }
+            }
+        }
+    }
+}</code></pre>
+<p>At this point, the IBM logo should be successfully drawn. To see it, we can modify the test function to print display the screen and purposefully fail the test.</p>
+<pre><code class="language-rust">// tests.rs
+
+use super::*;
+
+#[test]
+fn test_ibm_logo_rom(){
+    let mut chip = Chip8::new(include_bytes!(&quot;IBM Logo.ch8&quot;));
+    for _ in 0..700{
+        chip.step();
+    }
+    for y in 0..32{
+        for x in 0..64{
+            if chip.screen[x][y]{
+                print!(&quot;█&quot;)
+            } else {
+                print!(&quot; &quot;)
+            }
+        }
+        println!()
+    }
+    panic!();
+}</code></pre>
+<p>The expected result is shown below. The frame was added to show the space around the logo aswell.</p>
+<pre><code>------------------------------------------------------------------
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|            ████████ █████████   █████         █████            |
+|                                                                |
+|            ████████ ███████████ ██████       ██████            |
+|                                                                |
+|              ████     ███   ███   █████     █████              |
+|                                                                |
+|              ████     ███████     ███████ ███████              |
+|                                                                |
+|              ████     ███████     ███ ███████ ███              |
+|                                                                |
+|              ████     ███   ███   ███  █████  ███              |
+|                                                                |
+|            ████████ ███████████ █████   ███   █████            |
+|                                                                |
+|            ████████ █████████   █████    █    █████            |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+|                                                                |
+------------------------------------------------------------------
+</code></pre>
+<p>Next we just need to test if the output matches the expected output. We can modify the test function again to do this.</p>
+<pre><code class="language-rust">use super::*;
+
+#[test]
+fn test_ibm_logo_rom(){
+    const TARGET: [&amp;str; 32] = [
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;            ████████ █████████   █████         █████            &quot;,
+        &quot;                                                                &quot;,
+        &quot;            ████████ ███████████ ██████       ██████            &quot;,
+        &quot;                                                                &quot;,
+        &quot;              ████     ███   ███   █████     █████              &quot;,
+        &quot;                                                                &quot;,
+        &quot;              ████     ███████     ███████ ███████              &quot;,
+        &quot;                                                                &quot;,
+        &quot;              ████     ███████     ███ ███████ ███              &quot;,
+        &quot;                                                                &quot;,
+        &quot;              ████     ███   ███   ███  █████  ███              &quot;,
+        &quot;                                                                &quot;,
+        &quot;            ████████ ███████████ █████   ███   █████            &quot;,
+        &quot;                                                                &quot;,
+        &quot;            ████████ █████████   █████    █    █████            &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+        &quot;                                                                &quot;,
+    ];
+
+    let mut chip = Chip8::new(include_bytes!(&quot;IBM Logo.ch8&quot;));
+    for _ in 0..700{
+        chip.step();
+    }
+    for y in 0..32{
+        for x in 0..64{
+            if chip.screen[x][y]{
+                print!(&quot;█&quot;)
+            } else {
+                print!(&quot; &quot;)
+            }
+        }
+        println!()
+    }
+
+    for y in 0..32{
+        for x in 0..64{
+            if chip.screen[x][y]{
+                assert_eq!(TARGET[y].chars().nth(x).unwrap(), '█');
+            } else {
+                assert_eq!(TARGET[y].chars().nth(x).unwrap(), ' ');
+            }
+        }
+    }
+}</code></pre>
+<p>This final version of this test will be how the rest of the tests are implemented. As long as we know the expected output, this will check that the actual output matches and if not, it should display the actual output to the screen.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="2-1-basic_instructions.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="checkpoint_1.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="2-1-basic_instructions.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="checkpoint_1.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
